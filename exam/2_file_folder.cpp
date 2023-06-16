@@ -1,23 +1,91 @@
+#include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
-class Folder
+class no_implementation {};
+class Base
 {
-private:
-    string name;
-
+    string title;
+    int depth;
 public:
-    Folder(string name) : name(name) {}
+    Base(string title) : title(title) {}
+
+    string getTitle() { return title; }
+
+    virtual void setDepth(int depth) { this->depth = depth; }
+
+    virtual int getDepth() { return depth; }
+    virtual int getSize() = 0;
+    virtual void print() = 0;
+
+    virtual void add(Base* b) { throw no_implementation(); }
+
+    virtual ~Base() {}
 };
 
-class File
+class Folder : public Base
+{
+    vector<Base*> v;
+    int _depth = 0;
+public:
+    Folder(string title) : Base(title) {}
+
+    int getSize() override
+    {
+        int totalSize = 0;
+        for (Base* b : v)
+        {
+            totalSize += b->getSize();
+        }
+        return totalSize;
+    }
+    void print() override
+    {
+        cout << '[' + getTitle() + ']' << endl;
+
+        for (Base* b : v)
+        {
+            cout << string(getDepth() + 1, '\t');
+            b->print();
+        }
+    }
+    void add(Base* b) override
+    {
+        b->setDepth((b->getDepth() + 1));
+        v.push_back(b);
+    }
+    ~Folder()
+    {
+        cout << "deleted folder " << getTitle() << endl;
+        for (Base* b : v)
+        {
+            delete b;
+        }
+    }
+};
+
+class File : public Base
 {
 private:
-    string name;
     int size;
 
 public:
-    File(string name, int size) : name(name), size(size) {}
+    File(string title, int size) : Base(title), size(size) {}
+
+    int getSize() override
+    {
+        return size;
+    }
+    void print() override
+    {
+        cout << '(' + getTitle() + ',' + ' ' + to_string(getSize()) + ')' << endl;
+    }
+
+    ~File()
+    {
+        cout << "deleted file " << getTitle() << endl;
+    }
 };
 
 int main()
