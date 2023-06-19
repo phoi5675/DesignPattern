@@ -5,12 +5,20 @@ using namespace std;
 template<typename T>
 class Queue
 {
-    list<T> _list;
+    list<T>* _list;
 public:
-    Queue() {}
+    Queue()
+    {
+        _list = new list<T>;
+    }
 
-    void push(T value) {}
-    T pop() {return;}
+    void push(T value) { _list->push_back(value); }
+    T pop()
+    {
+        T elem = _list->back();
+        _list->pop_back();
+        return elem;
+    }
 };
 int main()
 {
